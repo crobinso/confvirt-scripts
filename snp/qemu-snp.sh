@@ -53,6 +53,8 @@ if [ "$DEBUGCON_STDIO" = "1" ] ; then
     SERIAL=pty
 fi
 
+#-kernel /home/crobinso/vmlinuz-6.1.9-200.fc37.x86_64 \
+#-initrd /home/crobinso/initramfs-6.1.9-200.fc37.x86_64.img \
 
 sudo $QEMU \
   -name guest=cole-f35-sevtest,debug-threads=on \
@@ -64,8 +66,6 @@ sudo $QEMU \
   -display none \
   -boot strict=on \
   -no-user-config \
-  -kernel /home/crobinso/vmlinuz-6.1.9-200.fc37.x86_64 \
-  -initrd /home/crobinso/initramfs-6.1.9-200.fc37.x86_64.img \
   -nodefaults \
   -rtc base=utc,driftfix=slew \
   -global kvm-pit.lost_tick_policy=delay \
