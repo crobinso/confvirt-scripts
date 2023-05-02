@@ -4,9 +4,12 @@
 ENABLE_UPM=${ENABLE_UPM:-0}
 # Enable SNP
 ENABLE_SNP=${ENABLE_SNP:-1}
+# Enable SVSM
+ENABLE_SVSM=${ENABLE_SVSM:-0}
 
 echo "ENABLE_SNP=${ENABLE_SNP}"
 echo "ENABLE_UPM=${ENABLE_UPM}"
+echo "ENABLE_SVSM=${ENABLE_SVSM}"
 
 FIRMWARE="/home/crobinso/src/ovmf/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd"
 #FIRMWARE="/home/crobinso/src/ovmf/Build/OvmfX64/DEBUG_GCC5/FV/OVMF_CODE.fd"
@@ -16,7 +19,7 @@ FIRMWARE="/usr/share/edk2/ovmf/OVMF.amdsev.fd"
 #NVRAM="/home/crobinso/src/ovmf/Build/OvmfX64/DEBUG_GCC5/FV/OVMF_VARS.fd"
 
 
-QEMU=/home/crobinso/src/qemu/build/x86_64-softmmu/qemu-system-x86_64
+#QEMU=/home/crobinso/src/qemu/build/x86_64-softmmu/qemu-system-x86_64
 QEMU=/usr/bin/qemu-system-x86_64
 
 
@@ -33,14 +36,21 @@ CPU="EPYC-Milan-v2"
 MEM="memory-backend-ram,id=ram1,size=2G   -overcommit mem-lock=on"
 MACHINE="-machine q35,memory-backend=ram1,pflash0=libvirt-pflash0-format"
 
+SNP_FLAGS=0
+if [ "$ENABLE_SVSM" = "1" ]; then
+    SNP_FLAGS=4
+    SVSM_ARG=",svsm=/usr/share/svsm-vtpm/svsm-vtpm.bin"
+    FIRMWARE="/usr/share/edk2/ovmf-svsm/OVMF_CODE.svsm.fd"
+    NVRAM="/usr/share/edk2/ovmf-svsm/OVMF_VARS.svsm.fd"
+fi
+
 # Works on UPM and non-UPM qemu on non-UPM kernel
 if [ "$ENABLE_SNP" = "1" ]; then
-    MACHINE="$MACHINE,confidential-guest-support=lsec0"
-    SEV="-object sev-snp-guest,id=lsec0,cbitpos=51,reduced-phys-bits=1"
+    MACHINE="$MACHINE,confidential-guest-support=lsec0${SVSM_ARG}"
+    SEV="-object sev-snp-guest,id=lsec0,cbitpos=51,reduced-phys-bits=1,init-flags=$SNP_FLAGS"
 
     if [ "$ENABLE_UPM" = "1" ]; then
-        SEV="$SEV,upm-mode=on"
-        # This only works on UPM branch
+        MACHINE="$MACHINE,kvm-type=protected"
         MEM="memory-backend-memfd-private,id=ram1,size=2G,share=true"
     fi
 fi
