@@ -26,7 +26,7 @@ QEMU=/usr/bin/qemu-system-x86_64
 # Not sure if anything uses this image...
 DISK=/var/lib/libvirt/images/f35-sev.img
 # This is F37 cloud, with `yum update` as of at least Feb 7. root:root
-DISK=/home/crobinso/f37-cloud.raw,format=raw
+DISK="/var/lib/libvirt/images/crobinso-snp.qcow2"
 
 
 # May be required for svsm
