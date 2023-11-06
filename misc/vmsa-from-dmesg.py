@@ -30,7 +30,7 @@ def _parse_args():
     desc = """
 Enable VMSA kernel debugging with:
 
-    echo 'func sev_es_sync_vmsa +p' > sudo tee /sys/kernel/debug/dynamic_debug/control
+    echo 'func sev_es_sync_vmsa +p' | sudo tee /sys/kernel/debug/dynamic_debug/control
 
 Launch your SEV/SEV-ES/SEV-SNP VM, then run this script.
 It will spit out the most recent VMSA dump and save it to vmsa0.bin.
